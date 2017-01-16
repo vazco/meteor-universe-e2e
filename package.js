@@ -1,6 +1,6 @@
 Package.describe({
     name: 'universe:e2e',
-    version: '0.0.2',
+    version: '0.0.3',
     summary: 'Complete end-to-end/acceptance testing solution for Meteor: Mocha/Chai & Selenium/WebdriverIO',
     git: '',
     documentation: 'README.md',
@@ -10,6 +10,7 @@ Package.describe({
 Npm.depends({
     mocha: '3.2.0',
     chai: '3.5.0',
+    'chai-as-promised': '6.0.0',
     webdriverio: '4.6.1',
     'selenium-standalone': '5.10.0'
 });
