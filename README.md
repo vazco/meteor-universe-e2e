@@ -171,9 +171,9 @@ Full API can be found at [webdriver.io](http://webdriver.io/api.html)
 
 ### Roadmap
 
-- [] Write test examples
-- [] Write tests for test driver :)
-- [] Make sure/write guide for most popular CI services
-- [] Allow to customize settings for mocha, selenium, webdriverio etc.
-- [] Better Meteor/React aware location strategy - probably as an external package
+- [ ] Allow to customize settings for mocha, selenium, webdriverio etc.
+- [ ] Write test examples
+- [ ] Check compatibility / write guides for most popular CI services
+- [ ] Write tests for test driver :)
+- [ ] Better Meteor/React aware location strategy - probably as an external package
 
