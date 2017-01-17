@@ -123,6 +123,34 @@ Complete list of available exported variables **on the server side**:
 - WebdriverIO API
     - `browser`
 
+### Configuration
+
+All included components could be configured to better suite your needs.
+
+Configuration is done via [Meteor settings](https://docs.meteor.com/api/core.html#Meteor-settings) under `universe:e2e` section.
+
+Example config could look like this:
+
+```json
+{
+  "universe:e2e": {
+    "webdriverio": {
+      "desiredCapabilities": {
+        "browserName": "chrome"
+      }
+    },
+    "selenium": {
+      "version": "2.53"
+    },
+    "mocha": {
+      "reporter": "nyan"
+    }
+  }
+}
+```
+
+More information about configuration options in next section.
+
 ### Batteries included
 
 This package intention is to give everything required to write acceptance tests from within the Meteor app.
@@ -141,6 +169,10 @@ If you want some test to be executed you better have it inside `describe`/`it` b
 
 Docs can be found at [mochajs.org](https://mochajs.org/)
 
+If you want to set custom reporter etc. you can provide options under `mocha` section of our config.
+List of available options can be found in [Mocha Wiki](https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options).  
+Please not that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know.
+
 #### Chai
 
 > Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.
@@ -149,7 +181,10 @@ Mocha doesn't come with any assertion library, so we need to bring our own.
 
 We decided to use Chai, but if have other preferences feel free to ignore this dependency.
 
-Chai docs about assertion styles can be found at [chaijs.com](http://chaijs.com/guide/styles/) 
+Chai docs about assertion styles can be found at [chaijs.com](http://chaijs.com/guide/styles/)
+
+We do not accept configuration options for Chai.
+If you want to add new plugin etc. please just extend provided instance in your app.
 
 #### Selenium
 
@@ -158,6 +193,13 @@ Chai docs about assertion styles can be found at [chaijs.com](http://chaijs.com/
 When using `universe:e2e` you don't have to interact with Selenium directly.
 
 Everything is taken care of, and selenium is installed and started under the hood right before your tests starts.
+
+Of course you need to have actual browsers installed on your system.
+We're installing only Selenium drivers, not the actual browsers, so you cannot test Safari under Linux or IE on Mac.
+
+You can provide two set of options for Selenium:
+ - Installation options as `selenium` in our config. [List of available options](https://github.com/vvo/selenium-standalone#seleniuminstallopts-cb). You probably want to use this one.
+ - Process spawn options as `seleniumStart` in our config. [List of available options](https://github.com/vvo/selenium-standalone#seleniumstartopts-cb).
 
 #### WebdriverIO
 
@@ -169,11 +211,14 @@ Using it's `browser` object you can manipulate real browsers inside your tests, 
 
 Full API can be found at [webdriver.io](http://webdriver.io/api.html)
 
-### Roadmap
+**Default browser used is Chrome**, if you want to use some other browser you must configure WebdriverIO settings.
+Also make sure that Selenium drivers are installed for selected browsers.
 
-- [ ] Allow to customize settings for mocha, selenium, webdriverio etc.
-- [ ] Write test examples
-- [ ] Check compatibility / write guides for most popular CI services
-- [ ] Write tests for test driver :)
-- [ ] Better Meteor/React aware location strategy - probably as an external package
+You can pass WebDriverIO configuration as `webdriverio` in our settings.
+
+List of available options and their explanation can be found at [WebdriverIO docs](http://webdriver.io/guide/getstarted/configuration.html).
+
+### Changelog and roadmap
+
+For planed roadmap and changes introduced in each version please check [the Github Project](https://github.com/vazco/meteor-universe-e2e/projects/1)
 
