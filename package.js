@@ -1,6 +1,6 @@
 Package.describe({
     name: 'universe:e2e',
-    version: '0.0.4',
+    version: '0.0.5',
     summary: 'Complete end-to-end/acceptance testing solution for Meteor: Mocha/Chai & Selenium/WebdriverIO',
     git: '',
     documentation: 'README.md',
