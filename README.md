@@ -4,7 +4,7 @@
 
 Complete end-to-end/acceptance testing solution for Meteor: Mocha/Chai & Selenium/WebdriverIO
 
-This package is currently in early beta.
+*This package is currently in early beta.*
 
 <!-- toc -->
 
@@ -16,12 +16,13 @@ This package is currently in early beta.
   * [Meteor "full application test mode" caveats](#meteor-full-application-test-mode-caveats)
 - [Writing tests](#writing-tests)
 - [Exported variables](#exported-variables)
+- [Configuration](#configuration)
 - [Batteries included](#batteries-included)
   * [Mocha](#mocha)
   * [Chai](#chai)
   * [Selenium](#selenium)
   * [WebdriverIO](#webdriverio)
-- [Roadmap](#roadmap)
+- [Changelog and roadmap](#changelog-and-roadmap)
 
 <!-- tocstop -->
 
@@ -184,7 +185,7 @@ We decided to use Chai, but if have other preferences feel free to ignore this d
 Chai docs about assertion styles can be found at [chaijs.com](http://chaijs.com/guide/styles/)
 
 We do not accept configuration options for Chai.
-If you want to add new plugin etc. please just extend provided instance in your app.
+If you want to add new plugin etc. please just extend provided instance in your app (`chai-as-promised` is already installed for your convenience).
 
 #### Selenium
 
