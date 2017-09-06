@@ -1,13 +1,16 @@
 import {Meteor} from 'meteor/meteor';
 
 import {mocha} from './lib/mocha';
-import {browser} from './lib/webdriverio';
-import {spawnSelenium} from './lib/selenium';
+import {createBrowser} from './lib/puppeteer';
 
 // Export mocha functions (describe, it etc.) and other public api
 export * from './lib/mocha';
 export * from './lib/chai';
-export {browser};
+export * from './lib/puppeteer';
+
+// Export puppeteer objects that will be initialized later
+export let browser = null;
+export let page = null;
 
 // Allow easier context checking
 Meteor.isE2E = true;
@@ -15,16 +18,17 @@ Meteor.isE2E = true;
 // Start is a hidden Meteor test-driver API
 export function start () {
     Meteor.startup(async () => {
-        // Start Selenium (this will log errors internally)
-        const selenium = await spawnSelenium();
+        // Launch a browser instance
+        browser = await createBrowser();
+
+        // Create a page instance to be ready to use by the user
+        page = await browser.newPage();
+        await page.goto(Meteor.absoluteUrl());
 
         // Perform cleanup if Meteor server restarts while the tests are running
         const cleanup = async () => {
-            // Close all browser windows
-            await browser.endAll().catch(() => {/* It could fail, it's ok :) */});
-
-            // Stop selenium server
-            selenium.kill();
+            // Closes browser with all the pages
+            await browser.close();
 
             console.info('[universe:e2e] Meteor server restart detected, interrupting ongoing tests...');
 
@@ -35,29 +39,13 @@ export function start () {
         // Since Meteor doesn't provide any exit hook, listening for SIGTERM is best what we can do
         process.once('SIGTERM', cleanup);
 
-        try {
-            // Start and wait until the browser is ready
-            await browser.init();
-        } catch (e) {
-            // Re-throw to prevent further execution
-            console.error(`[universe:e2e] Cannot init WebdriverIO session: ${e.message}`);
-            throw e;
-        }
-
         // Run the tests using Mocha
         mocha.run(async errorCount => {
-
-            // Gracefully stop WebDriverIO and Selenium
+            // Gracefully close browser with all the pages after tests
             try {
-                await browser.endAll();
+                await browser.close();
             } catch (e) {
-                console.error(`[universe:e2e] Cannot close WebdriverIO sessions: ${e.message}`);
-            }
-
-            try {
-                selenium.kill();
-            } catch (e) {
-                console.error(`[universe:e2e] Cannot stop Selenium process: ${e.message}`);
+                console.error(`[universe:e2e] Cannot close browser: ${e.message}`);
             }
 
             // We don't need to stop services on server restart anymore
@@ -70,4 +58,3 @@ export function start () {
         });
     });
 }
-
