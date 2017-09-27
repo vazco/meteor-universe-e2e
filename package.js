@@ -2,7 +2,7 @@
 
 Package.describe({
     name: 'universe:e2e',
-    version: '1.0.0-beta.1',
+    version: '0.3.0-beta.1',
     summary: 'Complete end-to-end/acceptance testing solution for Meteor: Mocha/Chai & Chrome Puppeteer',
     git: 'https://github.com/vazco/meteor-universe-e2e',
     documentation: 'README.md',
