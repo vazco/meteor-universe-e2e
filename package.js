@@ -14,7 +14,7 @@ Package.onUse(api => {
 
     api.use('ecmascript');
     api.use('promise', 'server');
-    api.use('universe:test-hooks');
+    api.use('universe:test-hooks@1.0.0-rc.1');
 
     api.mainModule('check-dependencies.js', 'server');
     api.mainModule('server.js', 'server');
