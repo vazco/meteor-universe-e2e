@@ -1,60 +1,36 @@
 import {Meteor} from 'meteor/meteor';
+import {onTest, onInterrupt} from 'meteor/universe:test-hooks';
 
 import {mocha} from './lib/mocha';
-import {createBrowser} from './lib/puppeteer';
+import {closeAllBrowsers} from './lib/puppeteer';
+
+// Re-expose test-hooks api so that this package could be used as a test driver
+export {start} from 'meteor/universe:test-hooks';
 
 // Export mocha functions (describe, it etc.) and other public api
 export * from './lib/mocha';
-export * from './lib/chai';
-export * from './lib/puppeteer';
-
-// Export puppeteer objects that will be initialized later
-export let browser = null;
-export let page = null;
+export {createBrowser} from './lib/puppeteer';
+export {onTest, onInterrupt};
 
 // Allow easier context checking
 Meteor.isE2E = true;
 
-// Start is a hidden Meteor test-driver API
-export function start () {
-    Meteor.startup(async () => {
-        // Launch a browser instance
-        browser = await createBrowser();
+// In case of Meteor server restart close all browser windows
+onInterrupt(closeAllBrowsers);
 
-        // Create a page instance to be ready to use by the user
-        page = await browser.newPage();
-        await page.goto(Meteor.absoluteUrl());
-
-        // Perform cleanup if Meteor server restarts while the tests are running
-        const cleanup = async () => {
-            // Closes browser with all the pages
-            await browser.close();
-
-            console.info('[universe:e2e] Meteor server restart detected, interrupting ongoing tests...');
-
-            // Actually stop the Meteor process
-            process.exit(0);
-        };
-
-        // Since Meteor doesn't provide any exit hook, listening for SIGTERM is best what we can do
-        process.once('SIGTERM', cleanup);
-
+onTest(done => {
+    try {
         // Run the tests using Mocha
+        // All tests should be registered in app by now
         mocha.run(async errorCount => {
-            // Gracefully close browser with all the pages after tests
-            try {
-                await browser.close();
-            } catch (e) {
-                console.error(`[universe:e2e] Cannot close browser: ${e.message}`);
-            }
+            // Tests are over, close browsers
+            await closeAllBrowsers();
 
-            // We don't need to stop services on server restart anymore
-            process.removeListener('SIGTERM', cleanup);
-
-            // In CI mode we stop Meteor, otherwise (watch mode) we leave it as is
-            if (process.env.CI) {
-                process.exit(errorCount > 0 ? 1 : 0);
-            }
+            // End the onTest hook, with an error if some tests failed
+            errorCount > 0 ? done(new Error(`Mocha reported ${errorCount} errors`)) : done();
         });
-    });
-}
+    } catch (e) {
+        // Just in case catch any unexpected errors
+        done(e);
+    }
+});
