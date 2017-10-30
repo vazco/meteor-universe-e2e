@@ -5,28 +5,8 @@
  */
 
 const supportedVersions = {
-    puppeteer: '0.11',
     mocha: '4'
 };
-
-let puppeteerVersion;
-try {
-    puppeteerVersion = require('puppeteer/package.json').version;
-} catch (e) {
-    throw new Error(
-        `[universe:e2e] Puppeteer must be installed to run the tests.
-                      You can do it with command:
-                      npm i -D puppeteer@${supportedVersions.puppeteer}
-    `);
-}
-
-if (!puppeteerVersion.startsWith(supportedVersions.puppeteer)) {
-    throw new Error(
-        `[universe:e2e] Installed Puppeteer version (${puppeteerVersion}) is not supported at the moment.
-                      You can install compatible version with:
-                      npm i -D puppeteer@${supportedVersions.puppeteer}
-    `);
-}
 
 let mochaVersion;
 try {
@@ -41,7 +21,7 @@ try {
 
 if (!mochaVersion.startsWith(supportedVersions.mocha)) {
     throw new Error(
-        `[universe:e2e] Installed Mocha version (${puppeteerVersion}) is not supported at the moment.
+        `[universe:e2e] Installed Mocha version (${mochaVersion}) is not supported at the moment.
                       You can install compatible version with:
                       npm i -D mocha@${supportedVersions.mocha}
     `);
