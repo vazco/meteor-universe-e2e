@@ -2,7 +2,7 @@
 
 Package.describe({
     name: 'universe:e2e',
-    version: '0.3.0-rc.1',
+    version: '0.3.0',
     summary: 'Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Puppeteer',
     git: 'https://github.com/vazco/meteor-universe-e2e',
     documentation: 'README.md',
@@ -10,7 +10,7 @@ Package.describe({
 });
 
 Package.onUse(api => {
-    api.versionsFrom('1.6-rc.5');
+    api.versionsFrom('1.6');
 
     api.use('ecmascript');
     api.use('promise', 'server');
