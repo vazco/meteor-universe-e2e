@@ -1,28 +1,11 @@
-<p align="center"><a href="http://unicms.io"><img src="http://unicms.io/banners/standalone.png" height="300"></a></p>
-
 # Universe:E2E
 
-Complete end-to-end/acceptance testing solution for Meteor: Mocha/Chai & Selenium/WebdriverIO
+Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Puppeteer
 
-*This package is currently in early beta.*
+*This package is currently in public beta, but we use it in [Vazco.eu](http://vazco.eu) projects with success so far.*
 
 <!-- toc -->
 
-- [Why?](#why)
-- [Installation](#installation)
-- [Usage](#usage)
-  * [Running tests in watch mode](#running-tests-in-watch-mode)
-  * [Running tests in Continuous Integration mode](#running-tests-in-continuous-integration-mode)
-  * [Meteor "full application test mode" caveats](#meteor-full-application-test-mode-caveats)
-- [Writing tests](#writing-tests)
-- [Exported variables](#exported-variables)
-- [Configuration](#configuration)
-- [Batteries included](#batteries-included)
-  * [Mocha](#mocha)
-  * [Chai](#chai)
-  * [Selenium](#selenium)
-  * [WebdriverIO](#webdriverio)
-- [Changelog and roadmap](#changelog-and-roadmap)
 
 <!-- tocstop -->
 
@@ -48,13 +31,20 @@ Tests are started and everything is managed from within the Meteor app, so when 
 
 You need to `meteor add` it to your app, but it does nothing unless you specify it while starting Meteor in test mode.
 
+Additionally you'll need to have [mocha](https://mochajs.org/) and [puppeteer](https://github.com/GoogleChrome/puppeteer) installed using npm (probably in `devDependencies`):
+
 ```
 meteor add universe:e2e
+meteor npm install --save-dev mocha puppeteer
 ```
 
-This package won't be bundled with your production build, nor loaded during normal development (it has `testOnly` flag).
+This package won't be bundled with your production build, nor loaded during normal development (it has a `testOnly` flag).
 
 ### Usage
+
+#### Setting up the project
+
+Introduction coming soon...
 
 #### Running tests in watch mode
 
@@ -84,9 +74,9 @@ This could be achieved with:
 CI=1 meteor test --full-app --driver-package universe:e2e --once --raw-logs
 ```
 
-`raw-logs` are still optional. Note `--once` flag and the `CI` environment variable - it must be set to truthy value (but it usually already is by CI providers).
+Note `--once` flag and the `CI` environment variable - it must be set to truthy value (but it usually already is by CI providers).
 
-Otherwise app won't stop with correct exit code after the tests end.
+Otherwise app won't stop with correct exit code when tests end.
 
 #### Meteor "full application test mode" caveats
 
@@ -117,16 +107,15 @@ Complete list of available exported variables **on the server side**:
     - `xdescribe`
     - `xit`
     - `xspecify`
-- Chai API
-    - `assert`
-    - `chai`
-    - `expect`
-- WebdriverIO API
-    - `browser`
+
+- Helpers
+    - `createBrowser`
+    - `onTest`
+    - `onInterrupt`
 
 ### Configuration
 
-All included components could be configured to better suite your needs.
+Some parts could be configured to better suite your needs.
 
 Configuration is done via [Meteor settings](https://docs.meteor.com/api/core.html#Meteor-settings) under `universe:e2e` section.
 
@@ -135,14 +124,6 @@ Example config could look like this:
 ```json
 {
   "universe:e2e": {
-    "webdriverio": {
-      "desiredCapabilities": {
-        "browserName": "chrome"
-      }
-    },
-    "selenium": {
-      "version": "2.53"
-    },
     "mocha": {
       "reporter": "nyan"
     }
@@ -156,9 +137,9 @@ More information about configuration options in next section.
 
 This package intention is to give everything required to write acceptance tests from within the Meteor app.
 
-Below you find quick info about software we bundle to make this package work for you out of the box.
+Below you find quick info about software we use to make this package work for you out of the box.
 
-If you need any extra libs/helpers (`faker` etc.) you can import them from npm as you would normally do in a Meteor app.
+If you need any extra libs/helpers (`chai`, `faker` etc.) you can import them from npm as you would normally do in a Meteor app.
 
 #### Mocha
 
@@ -174,50 +155,11 @@ If you want to set custom reporter etc. you can provide options under `mocha` se
 List of available options can be found in [Mocha Wiki](https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options).  
 Please not that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know.
 
-#### Chai
+#### Puppeteer
 
-> Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.
+> Puppeteer is a library which provides a high-level API to control headless Chrome. It can also be configured to use full (non-headless) Chrome.
 
-Mocha doesn't come with any assertion library, so we need to bring our own.
-
-We decided to use Chai, but if have other preferences feel free to ignore this dependency.
-
-Chai docs about assertion styles can be found at [chaijs.com](http://chaijs.com/guide/styles/)
-
-We do not accept configuration options for Chai.
-If you want to add new plugin etc. please just extend provided instance in your app (`chai-as-promised` is already installed for your convenience).
-
-#### Selenium
-
-> Selenium is a suite of tools to automate web browsers across many platforms.
-
-When using `universe:e2e` you don't have to interact with Selenium directly.
-
-Everything is taken care of, and selenium is installed and started under the hood right before your tests starts.
-
-Of course you need to have actual browsers installed on your system.
-We're installing only Selenium drivers, not the actual browsers, so you cannot test Safari under Linux or IE on Mac.
-
-You can provide two set of options for Selenium:
- - Installation options as `selenium` in our config. [List of available options](https://github.com/vvo/selenium-standalone#seleniuminstallopts-cb). You probably want to use this one.
- - Process spawn options as `seleniumStart` in our config. [List of available options](https://github.com/vvo/selenium-standalone#seleniumstartopts-cb).
-
-#### WebdriverIO
-
-> WebdriverIO lets you control a browser or a mobile application with just a few lines of code. Your test code will look simple, concise and easy to read. 
-
-WebdriverIO is core of the whole package.
-
-Using it's `browser` object you can manipulate real browsers inside your tests, making sure that everything is your app is working correctly.
-
-Full API can be found at [webdriver.io](http://webdriver.io/api.html)
-
-**Default browser used is Chrome**, if you want to use some other browser you must configure WebdriverIO settings.
-Also make sure that Selenium drivers are installed for selected browsers.
-
-You can pass WebDriverIO configuration as `webdriverio` in our settings.
-
-List of available options and their explanation can be found at [WebdriverIO docs](http://webdriver.io/guide/getstarted/configuration.html).
+Introduction coming soon...
 
 ### Changelog and roadmap
 
