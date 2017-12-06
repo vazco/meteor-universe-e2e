@@ -9,6 +9,7 @@ export {start} from 'meteor/universe:test-hooks';
 
 // Export mocha functions (describe, it etc.) and other public api
 export * from './lib/mocha';
+export * from './util';
 export {createBrowser} from './lib/puppeteer';
 export {onTest, onInterrupt};
 
