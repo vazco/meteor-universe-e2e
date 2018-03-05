@@ -6,6 +6,21 @@ Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Pupp
 
 <!-- toc -->
 
+- [Why?](#why)
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Setting up the project](#setting-up-the-project)
+  * [Running tests in watch mode](#running-tests-in-watch-mode)
+  * [Running tests in Continuous Integration mode](#running-tests-in-continuous-integration-mode)
+    + [Usage with Bitbucket Pipelines](#usage-with-bitbucket-pipelines)
+  * [Meteor "full application test mode" caveats](#meteor-full-application-test-mode-caveats)
+- [Writing tests](#writing-tests)
+- [Exported variables](#exported-variables)
+- [Configuration](#configuration)
+- [Batteries included](#batteries-included)
+  * [Mocha](#mocha)
+  * [Puppeteer](#puppeteer)
+- [Changelog and roadmap](#changelog-and-roadmap)
 
 <!-- tocstop -->
 
@@ -21,9 +36,9 @@ From [Meteor guide](https://guide.meteor.com/testing.html#acceptance-testing):
 
 There are other software that would allow you to perform E2E/acceptance tests of your Meteor app (e.g. Chimp, Nightwatch, Starrynight) but we found them really cumbersome.
 
-This package is using test drivers introduced with Meteor 1.3 and integrates more seamlessly with whole Meteor stack.
+This package is using test drivers introduced with Meteor 1.3 and integrates more seamlessly with the whole Meteor stack.
 
-Tests are started and everything is managed from within the Meteor app, so when writing test specs you can use everything you would normally use in your app.
+Everything is managed inside your Meteor app, so when writing test specs you can use everything you would normally use in your app.
 
 ### Installation
 
@@ -44,7 +59,7 @@ This package won't be bundled with your production build, nor loaded during norm
 
 #### Setting up the project
 
-Introduction coming soon...
+> Introduction coming soon...
 
 #### Running tests in watch mode
 
@@ -78,6 +93,10 @@ Note `--once` flag and the `CI` environment variable - it must be set to truthy 
 
 Otherwise app won't stop with correct exit code when tests end.
 
+##### Usage with Bitbucket Pipelines
+
+> Introduction coming soon...
+
 #### Meteor "full application test mode" caveats
 
 Meteor in this mode will start your application as it normally would (but with empty DB after each start, it keeps DB data during restarts in watch mode).
@@ -88,7 +107,7 @@ It will also load files matching `*.app-test[s].*` and `*.app-spec[s].*`, e.g. `
 
 ### Writing tests
 
-Examples coming soon...
+> Examples coming soon...
 
 ### Exported variables
 
