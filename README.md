@@ -2,7 +2,7 @@
 
 Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Puppeteer
 
-*This package is currently in public beta, but we use it in [Vazco.eu](http://vazco.eu) projects with success so far.*
+*This package is currently in public beta, but we use it in production at [Vazco.eu](http://vazco.eu) with success so far.*
 
 <!-- toc -->
 
@@ -30,7 +30,7 @@ Everything is managed inside your Meteor app, so when writing test specs you can
 
 You need to `meteor add` it to your app, but it does nothing unless you specify it while starting Meteor in test mode.
 
-Additionally you'll need to have [mocha](https://mochajs.org/) and [puppeteer](https://github.com/GoogleChrome/puppeteer) installed using npm (probably in `devDependencies`):
+Additionally you'll need to have [Mocha](https://mochajs.org/) and [Puppeteer](https://github.com/GoogleChrome/puppeteer) installed using npm (probably in `devDependencies`):
 
 ```
 meteor add universe:e2e
@@ -61,12 +61,13 @@ In watch mode app will start and reload on any file change (either in app code o
 You need to stop it as you would normally stop Meteor in development mode.
 
 If you want your tests running at the same time you work on your app, you can start them on different port (e.g. using `--port 4000` flag).
+Or work on the same instance, if dropping database data after you stop the test runner (not between Meteor restarts) is ok for you.
 
 #### Running tests in Continuous Integration mode
 
 This package is developed to use with CI servers in mind.
 
-In this scenario you probably want to run the tests once and exit with code depending on tests results.
+In this scenario you probably want to run the tests once and exit with code depending on tests results.  
 This could be achieved with:
 
 ```
@@ -79,7 +80,21 @@ Otherwise app won't stop with correct exit code when tests end.
 
 ##### Usage with Bitbucket Pipelines
 
-> Introduction coming soon...
+Example of a `bitbucket-pipelines.yml` file that could be used to automate testing on the Pipelines CI.
+
+```yml
+image: vazco/meteor-pipelines
+
+pipelines:
+  default:
+    - step:
+        script:
+          - meteor npm install
+          - meteor test --full-app --driver-package universe:e2e --once --raw-logs
+
+```
+
+`vazco/meteor-pipelines` is a Docker image optimized for Meteor and E2E testing, and can be used on other Continuous Integration systems, if you don't mind the name :)
 
 #### Meteor "full application test mode" caveats
 
@@ -91,11 +106,81 @@ It will also load files matching `*.app-test[s].*` and `*.app-spec[s].*`, e.g. `
 
 ### Writing tests
 
-> Examples coming soon...
+Tests can be written like regular Mocha test suites, only difference is that API like `describe` or `it` must be imported from `meteor/universe:e2e` atmosphere package.
+
+Inside the test cases you can use Puppeteer API (with exported `browser` and `page` objects) to manipulate the browser and simulate user behavior.
+You can spawn new browser instances and pages (tabs) if test cases require such action.
+
+At any point you can use extra libraries like `chai`, `faker` or even any function from your codebase - the tests are running INSIDE the Meteor app (server side) so you can do anything you are able to do inside Meteor project. One example could be database reset or fixtures right inside Mocha's `before` callback. Possibilities are limitless.
+
+#### Example test suites
+
+```javascript
+import {describe, it, page, setValue} from 'meteor/universe:e2e';
+import {expect} from 'chai';
+import faker from 'faker';
+
+describe('Registration', () => {
+    /* ... */
+    it('should fill and send register form', async () => {
+        // Generate random username and password
+        const password = faker.internet.password();
+        const username = faker.internet.userName();
+
+        // Fill form and submit using Puppeteer API
+        await page.type('#login-username', username);
+        await page.type('#login-password', password);
+        await page.type('#login-password-again', password);
+        await page.click('#login-buttons-password');
+    });
+
+    it('should be logged in after registration', async () => {
+        // Execute function in the browser context
+        await page.waitFor(() => Meteor.user() !== null, {timeout: 2000});
+    });
+    /* ... */
+});
+
+describe('Tasks', () => {
+    it('should have new task input', async () => {
+        await page.waitFor('form.new-task input', {timeout: 1000});
+    });
+
+    it('should be possible to add new task', async () => {
+        const text = faker.lorem.sentence();
+
+        // Insert text into form and submit it
+        await setValue({page}, 'form.new-task input', text);
+        await page.keyboard.press('Enter');
+
+        // Check (using XPath as an example) if a new task with this text will show up
+        await page.waitForXPath(`//span[@data-test='task-text'][contains(.,'${text}')]`, {timeout: 1000});
+    });
+
+    it('should be marked as private', async () => {
+        // Get first task handle
+        const task = await page.$('[data-test="task-item"]:nth-child(1)');
+
+        // There should not be a class name
+        expect(await page.evaluate(task => task.className, task)).to.equal('');
+
+        // Click button and mark as private
+        await task.$('button.toggle-private').then(el => el.click());
+
+        // There should be a private class right now
+        expect(await page.evaluate(task => task.className, task)).to.equal('private');
+
+        // Cleanup task reference
+        await task.dispose();
+    });
+});
+```
+
+More use cases like this can be found in the example project - [E2E Simple Todos](https://github.com/vazco/meteor-e2e-simple-todos) (based on Meteor/React tutorial)   
 
 ### Exported variables
 
-Complete list of available exported variables **on the server side**:
+Complete list of public API available as functions exported **on the server side**:
 
 - Mocha API
     - `after`
@@ -111,30 +196,46 @@ Complete list of available exported variables **on the server side**:
     - `xit`
     - `xspecify`
 
-- Helpers
-    - `createBrowser`
+- Utilities
+    - `createBrowser` (documentation can be found at `lib/puppeteer.js`)
     - `onTest`
     - `onInterrupt`
+
+- Puppeteer helpers (new helpers will be added over time, PR are welcome)
+    - `resizeWindow`
+    - `setValue`
+
+Helpers' code and documentation can be found inside `helpers/` directory. 
 
 ### Configuration
 
 Some parts could be configured to better suite your needs.
 
-Configuration is done via [Meteor settings](https://docs.meteor.com/api/core.html#Meteor-settings) under `universe:e2e` section.
+Your custom configuration can be provided to the `setup` method.
 
 Example config could look like this:
 
-```json
-{
-  "universe:e2e": {
-    "mocha": {
-      "reporter": "nyan"
+```js
+import {setup} from 'meteor/universe:e2e';
+
+setup({
+    mocha: { // example customization of Mocha settings
+        reporter: 'spec',
+        timeout: 30000,
+        // ... other Mocha options, full list can be found at lib/mocha.js 
+    },
+    browser: { // options passed to `createBrowser`
+        isCI: false, // force environment default, leave this out for auto-detection
+        createDefaultBrowser: true, // set to false to prevent browser creation and call `createBrowser` on your own
+        launchOptions: { // options passed to Puppeteer launch settings
+            slowMo: 50
+            // ... full list can be found at https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions
+        }
     }
-  }
-}
+});
 ```
 
-More information about configuration options in next section.
+All keys are optional, you can just call `setup()` and use sane defaults.
 
 ### Batteries included
 
@@ -156,15 +257,25 @@ Docs can be found at [mochajs.org](https://mochajs.org/)
 
 If you want to set custom reporter etc. you can provide options under `mocha` section of our config.
 List of available options can be found in [Mocha Wiki](https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options).  
-Please not that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know.
+Please not that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know with your use case.
 
 #### Puppeteer
 
-> Puppeteer is a library which provides a high-level API to control headless Chrome. It can also be configured to use full (non-headless) Chrome.
+> Puppeteer is a library which provides a high-level API to control headless Chrome. It can also be configured to use full (non-headless) Chrome. Most things that you can do manually in the browser can be done using Puppeteer.
 
-Introduction coming soon...
+Puppeteer is used for browser automation, unlike most E2E test runners, which are based on Selenium.
+Our solution is more powerful, but limited to only one browser family (Chromium and Chrome).
+Depending on your case this may or may not be an issue for you.
 
-### Changelog and roadmap
+Puppeteer API should be familiar to people using other browser testing frameworks.
+Universe E2E creates an instance of Puppeteer's `browser` an `page` for you, so you can them to manipulate spawned browser with Puppeteer's API.
 
-For planed roadmap and changes introduced in each version please check [the Github Project](https://github.com/vazco/meteor-universe-e2e/projects/1)
+Universe E2E v0.2 and earlier was based on Selenium and WebDriverIO, so [you can check it out](https://github.com/vazco/meteor-universe-e2e/tree/v0.2.0) if your looking for such solution, but we're not providing support for it anymore. 
 
+### Changelog
+
+Version history can be found at [releases page](https://github.com/vazco/meteor-universe-e2e/releases).
+
+### Licence
+
+MIT Licence
