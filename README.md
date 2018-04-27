@@ -6,22 +6,6 @@ Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Pupp
 
 <!-- toc -->
 
-- [Why?](#why)
-- [Installation](#installation)
-- [Usage](#usage)
-  * [Setting up the project](#setting-up-the-project)
-  * [Running tests in watch mode](#running-tests-in-watch-mode)
-  * [Running tests in Continuous Integration mode](#running-tests-in-continuous-integration-mode)
-    + [Usage with Bitbucket Pipelines](#usage-with-bitbucket-pipelines)
-  * [Meteor "full application test mode" caveats](#meteor-full-application-test-mode-caveats)
-- [Writing tests](#writing-tests)
-- [Exported variables](#exported-variables)
-- [Configuration](#configuration)
-- [Batteries included](#batteries-included)
-  * [Mocha](#mocha)
-  * [Puppeteer](#puppeteer)
-- [Changelog and roadmap](#changelog-and-roadmap)
-
 <!-- tocstop -->
 
 ### Why?

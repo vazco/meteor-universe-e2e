@@ -5,7 +5,7 @@
  */
 
 const supportedVersions = {
-    mocha: '4'
+    mocha: '5'
 };
 
 let mochaVersion;
