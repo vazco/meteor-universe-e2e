@@ -6,6 +6,24 @@ Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Pupp
 
 <!-- toc -->
 
+- [Why?](#why)
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Setting up the project](#setting-up-the-project)
+  * [Running tests in watch mode](#running-tests-in-watch-mode)
+  * [Running tests in Continuous Integration mode](#running-tests-in-continuous-integration-mode)
+    + [Usage with Bitbucket Pipelines](#usage-with-bitbucket-pipelines)
+  * [Meteor "full application test mode" caveats](#meteor-full-application-test-mode-caveats)
+- [Writing tests](#writing-tests)
+  * [Example test suites](#example-test-suites)
+- [Exported variables](#exported-variables)
+- [Configuration](#configuration)
+- [Batteries included](#batteries-included)
+  * [Mocha](#mocha)
+  * [Puppeteer](#puppeteer)
+- [Changelog](#changelog)
+- [Licence](#licence)
+
 <!-- tocstop -->
 
 ### Why?
@@ -18,7 +36,7 @@ From [Meteor guide](https://guide.meteor.com/testing.html#acceptance-testing):
 
 > Acceptance testing is the process of taking an unmodified version of our application and testing it from the “outside” to make sure it behaves in a way we expect. Typically if an app passes acceptance tests, we have done our job properly from a product perspective.
 
-There are other software that would allow you to perform E2E/acceptance tests of your Meteor app (e.g. Chimp, Nightwatch, Starrynight) but we found them really cumbersome.
+There is other software that would allow you to perform E2E/acceptance tests of your Meteor app (e.g. Chimp, Nightwatch, Starrynight) but we found them really cumbersome.
 
 This package is using test drivers introduced with Meteor 1.3 and integrates more seamlessly with the whole Meteor stack.
 
@@ -30,7 +48,7 @@ Everything is managed inside your Meteor app, so when writing test specs you can
 
 You need to `meteor add` it to your app, but it does nothing unless you specify it while starting Meteor in test mode.
 
-Additionally you'll need to have [Mocha](https://mochajs.org/) and [Puppeteer](https://github.com/GoogleChrome/puppeteer) installed using npm (probably in `devDependencies`):
+Additionally, you'll need to have [Mocha](https://mochajs.org/) and [Puppeteer](https://github.com/GoogleChrome/puppeteer) installed using npm (probably in `devDependencies`):
 
 ```
 meteor add universe:e2e
@@ -43,7 +61,23 @@ This package won't be bundled with your production build, nor loaded during norm
 
 #### Setting up the project
 
-> Introduction coming soon...
+Once the test driver and npm dependencies are installed, you need to add some setup code and write first tests.
+
+We recommend a structure where all acceptance tests are stored inside a directory that is not loaded by default (e.g inside `imports/e2e-tests`) and only a single entry point with all imports in order is available to the app (e.g. a `main.app-tests.js` file, see caveats for more info).
+
+Inside this file, you need to call a setup function as early as possible in the app lifecycle
+
+```javascript
+import {setup} from 'meteor/universe:e2e';
+
+setup(/** extra options go here **/)
+  .then(() => {/** test environment is ready **/})
+  .catch(() => {/** something went wrong **/});
+```
+
+For available options check [Configuration](#configuration) section below.
+
+Complete setup for a working application can be found in the example project - [E2E Simple Todos](https://github.com/vazco/meteor-e2e-simple-todos).
 
 #### Running tests in watch mode
 
@@ -60,23 +94,23 @@ Raw logs flag is optional, but it helps with displaying test results.
 In watch mode app will start and reload on any file change (either in app code or in tests).
 You need to stop it as you would normally stop Meteor in development mode.
 
-If you want your tests running at the same time you work on your app, you can start them on different port (e.g. using `--port 4000` flag).
+If you want your tests running at the same time you work on your app, you can start them on a different port (e.g. using `--port 4000` flag).
 Or work on the same instance, if dropping database data after you stop the test runner (not between Meteor restarts) is ok for you.
 
 #### Running tests in Continuous Integration mode
 
 This package is developed to use with CI servers in mind.
 
-In this scenario you probably want to run the tests once and exit with code depending on tests results.  
+In this scenario, you probably want to run the tests once and exit with code depending on tests results.  
 This could be achieved with:
 
 ```
 CI=1 meteor test --full-app --driver-package universe:e2e --once --raw-logs
 ```
 
-Note `--once` flag and the `CI` environment variable - it must be set to truthy value (but it usually already is by CI providers).
+Note `--once` flag and the `CI` environment variable - it must be set to a truthy value (but it usually already is by CI providers).
 
-Otherwise app won't stop with correct exit code when tests end.
+Otherwise, app won't stop with correct exit code when tests end.
 
 ##### Usage with Bitbucket Pipelines
 
@@ -106,12 +140,12 @@ It will also load files matching `*.app-test[s].*` and `*.app-spec[s].*`, e.g. `
 
 ### Writing tests
 
-Tests can be written like regular Mocha test suites, only difference is that API like `describe` or `it` must be imported from `meteor/universe:e2e` atmosphere package.
+Tests can be written like regular Mocha test suites, the only difference is that API like `describe` or `it` must be imported from `meteor/universe:e2e` atmosphere package.
 
-Inside the test cases you can use Puppeteer API (with exported `browser` and `page` objects) to manipulate the browser and simulate user behavior.
+Inside the test cases, you can use Puppeteer API (with exported `browser` and `page` objects) to manipulate the browser and simulate user behavior.
 You can spawn new browser instances and pages (tabs) if test cases require such action.
 
-At any point you can use extra libraries like `chai`, `faker` or even any function from your codebase - the tests are running INSIDE the Meteor app (server side) so you can do anything you are able to do inside Meteor project. One example could be database reset or fixtures right inside Mocha's `before` callback. Possibilities are limitless.
+At any point, you can use extra libraries like `chai`, `faker` or even any function from your codebase - the tests are running INSIDE the Meteor app (server side) so you can do anything you are able to do inside Meteor project. One example could be database reset or fixtures right inside Mocha's `before` callback. Possibilities are limitless.
 
 #### Example test suites
 
@@ -176,11 +210,11 @@ describe('Tasks', () => {
 });
 ```
 
-More use cases like this can be found in the example project - [E2E Simple Todos](https://github.com/vazco/meteor-e2e-simple-todos) (based on Meteor/React tutorial)   
+More use cases like this can be found in the example project - [E2E Simple Todos](https://github.com/vazco/meteor-e2e-simple-todos) (based on the Meteor/React tutorial)   
 
 ### Exported variables
 
-Complete list of public API available as functions exported **on the server side**:
+A complete list of public API available as functions exported **on the server side**:
 
 - Mocha API
     - `after`
@@ -209,7 +243,7 @@ Helpers' code and documentation can be found inside `helpers/` directory.
 
 ### Configuration
 
-Some parts could be configured to better suite your needs.
+Some parts could be configured to better suit your needs.
 
 Your custom configuration can be provided to the `setup` method.
 
@@ -241,7 +275,7 @@ All keys are optional, you can just call `setup()` and use sane defaults.
 
 This package intention is to give everything required to write acceptance tests from within the Meteor app.
 
-Below you find quick info about software we use to make this package work for you out of the box.
+Below you find quick info about the software we use to make this package work for you out of the box.
 
 If you need any extra libs/helpers (`chai`, `faker` etc.) you can import them from npm as you would normally do in a Meteor app.
 
@@ -251,20 +285,20 @@ If you need any extra libs/helpers (`chai`, `faker` etc.) you can import them fr
 
 Mocha is used to run all test suites in `universe:e2e`.
 
-If you want some test to be executed you better have it inside `describe`/`it` block.
+If you want some test to be executed, you better have it inside `describe`/`it` block.
 
 Docs can be found at [mochajs.org](https://mochajs.org/)
 
-If you want to set custom reporter etc. you can provide options under `mocha` section of our config.
+If you want to set custom reporter etc. you can provide options under the `mocha` section of our config.
 List of available options can be found in [Mocha Wiki](https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options).  
-Please not that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know with your use case.
+Please note that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know with your use case.
 
 #### Puppeteer
 
 > Puppeteer is a library which provides a high-level API to control headless Chrome. It can also be configured to use full (non-headless) Chrome. Most things that you can do manually in the browser can be done using Puppeteer.
 
 Puppeteer is used for browser automation, unlike most E2E test runners, which are based on Selenium.
-Our solution is more powerful, but limited to only one browser family (Chromium and Chrome).
+Our solution is more powerful but limited to only one browser family (Chromium and Chrome).
 Depending on your case this may or may not be an issue for you.
 
 Puppeteer API should be familiar to people using other browser testing frameworks.
