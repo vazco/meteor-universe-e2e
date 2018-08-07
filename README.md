@@ -1,4 +1,16 @@
-# Universe:E2E
+<h1 align="center">
+    <a href="https://github.com/vazco">vazco</a>/Universe E2E
+</h1>
+
+<p align="center">
+    <img src="https://img.shields.io/david/peer/vazco/eslint-config-vazco.svg" alt="peerDependencies">
+    <img src="https://img.shields.io/david/dev/vazco/eslint-config-vazco.svg" alt="devDependencies">
+    <a href="https://vazco.eu">
+        <img src="https://img.shields.io/badge/vazco-package-blue.svg?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QMfFAIRHb8WQgAAAY1JREFUKM%2BNkLFrGgEUxr87FMnpnXdIqxi1Q3VxachgSbcOgRBCTMbgH9CCW%2BjSUminSpEmBEIpHW7rkCmQSSjEKVOGEAK5bOFyk4c5TMRTyZ1fl5aK9ai%2F8b334%2Ft4QBBmLQmz9jpoLSKYPQCfYdaezi6atTKAMoAYgK1pJ8LkQPr5JspHsbO%2BFilAEADQArCA3Ftn%2FC40KebPO4Ln37peNNxrFxPSXTaW9cPiewDbgYkkXwBYB3B5dHES3W8cpM254ctOJhr3wsKqs7Zj%2FdOZZITkMf9yT%2FKq3e18eHf47fmTT5XE1H%2BQ3GAwDyQ%2FkkxMSvLvhP%2FxZVLc42zYJBf%2FSPMkW57nsd%2Fv03VdDgYDjkajIPkryVDIdd1Xtm0%2Fdhznptvtmr7vu5IkRRRFySiKko%2FH45BlebzgJoBdodls%2FjAM49SyrIau69etVmsIIFStVnPFYvFZoVBY1jRtJZlMpjRNm5MkCaIofhfq9XrMMIyeruuc9u1KpRIulUqqqqpLqqqW0%2Bl0OZVKyb8ANqUwunhV3dcAAAAASUVORK5CYII%3D&style=flat-square">
+    </a>
+</p>
+
+&nbsp;
 
 Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Puppeteer
 
@@ -22,7 +34,7 @@ Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Pupp
   * [Mocha](#mocha)
   * [Puppeteer](#puppeteer)
 - [Changelog](#changelog)
-- [Licence](#licence)
+- [License](#license)
 
 <!-- tocstop -->
 
@@ -101,7 +113,7 @@ Or work on the same instance, if dropping database data after you stop the test 
 
 This package is developed to use with CI servers in mind.
 
-In this scenario, you probably want to run the tests once and exit with code depending on tests results.  
+In this scenario, you probably want to run the tests once and exit with code depending on tests results.
 This could be achieved with:
 
 ```
@@ -210,7 +222,7 @@ describe('Tasks', () => {
 });
 ```
 
-More use cases like this can be found in the example project - [E2E Simple Todos](https://github.com/vazco/meteor-e2e-simple-todos) (based on the Meteor/React tutorial)   
+More use cases like this can be found in the example project - [E2E Simple Todos](https://github.com/vazco/meteor-e2e-simple-todos) (based on the Meteor/React tutorial)
 
 ### Exported variables
 
@@ -239,7 +251,7 @@ A complete list of public API available as functions exported **on the server si
     - `resizeWindow`
     - `setValue`
 
-Helpers' code and documentation can be found inside `helpers/` directory. 
+Helpers' code and documentation can be found inside `helpers/` directory.
 
 ### Configuration
 
@@ -256,7 +268,7 @@ setup({
     mocha: { // example customization of Mocha settings
         reporter: 'spec',
         timeout: 30000,
-        // ... other Mocha options, full list can be found at lib/mocha.js 
+        // ... other Mocha options, full list can be found at lib/mocha.js
     },
     browser: { // options passed to `createBrowser`
         isCI: false, // force environment default, leave this out for auto-detection
@@ -290,7 +302,7 @@ If you want some test to be executed, you better have it inside `describe`/`it` 
 Docs can be found at [mochajs.org](https://mochajs.org/)
 
 If you want to set custom reporter etc. you can provide options under the `mocha` section of our config.
-List of available options can be found in [Mocha Wiki](https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options).  
+List of available options can be found in [Mocha Wiki](https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options).
 Please note that only `ui` supported at the moment is `tdd`. If you want to use `bdd` please let us know with your use case.
 
 #### Puppeteer
@@ -304,12 +316,14 @@ Depending on your case this may or may not be an issue for you.
 Puppeteer API should be familiar to people using other browser testing frameworks.
 Universe E2E creates an instance of Puppeteer's `browser` an `page` for you, so you can them to manipulate spawned browser with Puppeteer's API.
 
-Universe E2E v0.2 and earlier was based on Selenium and WebDriverIO, so [you can check it out](https://github.com/vazco/meteor-universe-e2e/tree/v0.2.0) if your looking for such solution, but we're not providing support for it anymore. 
+Universe E2E v0.2 and earlier was based on Selenium and WebDriverIO, so [you can check it out](https://github.com/vazco/meteor-universe-e2e/tree/v0.2.0) if your looking for such solution, but we're not providing support for it anymore.
 
 ### Changelog
 
 Version history can be found at [releases page](https://github.com/vazco/meteor-universe-e2e/releases).
 
-### Licence
+### License
 
-MIT Licence
+<img src="https://vazco.eu/banner.png" align="right">
+
+**Like every package maintained by [Vazco](https://vazco.eu/), Universe E2E is [MIT licensed](https://github.com/vazco/uniforms/blob/master/LICENSE).**
