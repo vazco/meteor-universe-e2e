@@ -2,7 +2,7 @@
 
 Complete end-to-end/acceptance testing solution for Meteor based on Mocha & Puppeteer
 
-*This package is currently in public beta, but we use it in production at [Vazco.eu](http://vazco.eu) with success so far.*
+**[Deprecated] This project is no longer maintained.**
 
 <!-- toc -->
 
